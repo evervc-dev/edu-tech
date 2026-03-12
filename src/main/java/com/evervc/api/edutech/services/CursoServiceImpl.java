@@ -4,6 +4,7 @@ import com.evervc.api.edutech.dto.CursoRequestDTO;
 import com.evervc.api.edutech.dto.CursoResponseDTO;
 import com.evervc.api.edutech.entities.Categoria;
 import com.evervc.api.edutech.entities.Curso;
+import com.evervc.api.edutech.exceptions.RecursoNoEncontradoException;
 import com.evervc.api.edutech.mappers.CursoMapper;
 import com.evervc.api.edutech.repositories.CategoriaRepository;
 import com.evervc.api.edutech.repositories.CursoRepository;
@@ -23,7 +24,7 @@ public class CursoServiceImpl implements CursoService {
     public CursoResponseDTO crearCurso(CursoRequestDTO requestDTO) {
         // Busca la Categoría en la BD IMPORTANTE: (hay que actualizar con el NotFound)
         Categoria categoria = categoriaRepository.findById(requestDTO.categoriaId())
-                .orElseThrow(() -> new RuntimeException("No se encontró la categoría con ID: " + requestDTO.categoriaId()));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró la categoría con ID: " + requestDTO.categoriaId()));
 
         // Mapeo DTO a Entidad
         // Aquí MapStruct ejecuta el @AfterMapping y enlaza los módulos a este curso de una vez

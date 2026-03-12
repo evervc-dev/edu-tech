@@ -6,6 +6,8 @@ import com.evervc.api.edutech.entities.Curso;
 import com.evervc.api.edutech.entities.Estudiante;
 import com.evervc.api.edutech.entities.Inscripcion;
 import com.evervc.api.edutech.enums.Estado;
+import com.evervc.api.edutech.exceptions.RecursoNoEncontradoException;
+import com.evervc.api.edutech.exceptions.ReglaNegocioException;
 import com.evervc.api.edutech.mappers.InscripcionMapper;
 import com.evervc.api.edutech.repositories.CursoRepository;
 import com.evervc.api.edutech.repositories.EstudianteRepository;
@@ -32,16 +34,16 @@ public class InscripcionServiceImpl implements InscripcionService {
 
         // Evitar inscripciones duplicadas
         if (inscripcionRepository.existsByEstudianteIdAndCursoId(estudianteId, cursoId)) {
-            throw new RuntimeException("El estudiante ya se encuentra inscrito en este curso.");
+            throw new ReglaNegocioException("El estudiante ya se encuentra inscrito en este curso.");
         }
 
-        // Valida existencia del Estudiante
+        // Verifica la existencia del Estudiante
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
-                .orElseThrow(() -> new RuntimeException("No se encontró el estudiante con ID: " + estudianteId));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el estudiante con ID: " + estudianteId));
 
-        // Valida existencia del Curso
+        // Verifica la existencia del Curso
         Curso curso = cursoRepository.findById(cursoId)
-                .orElseThrow(() -> new RuntimeException("No se encontró el curso con ID: " + cursoId));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el curso con ID: " + cursoId));
 
         // Mapeo base (MapStruct ignoró estudiante, curso, fecha y estado)
         Inscripcion nuevaInscripcion = inscripcionMapper.toEntity(requestDTO);

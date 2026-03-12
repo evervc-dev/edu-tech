@@ -3,6 +3,7 @@ package com.evervc.api.edutech.services;
 import com.evervc.api.edutech.dto.EstudianteRequestDTO;
 import com.evervc.api.edutech.dto.EstudianteResponseDTO;
 import com.evervc.api.edutech.entities.Estudiante;
+import com.evervc.api.edutech.exceptions.ReglaNegocioException;
 import com.evervc.api.edutech.mappers.EstudianteMapper;
 import com.evervc.api.edutech.repositories.EstudianteRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,8 @@ public class EstudianteServiceImpl implements EstudianteService {
     public EstudianteResponseDTO crearEstudiante(EstudianteRequestDTO requestDTO) {
         // Valida que el email no exista previamente
         if (estudianteRepository.existsByEmail(requestDTO.email())) {
-            // Lanza una excepción IMPORTANTE: (más adelante se debe usar con el ControllerAdvice)
-            throw new RuntimeException("Ya existe un estudiante registrado con el email: " + requestDTO.email());
+            // Lanza una excepción indicando de que ya está registrado en la db
+            throw new ReglaNegocioException("Ya existe un estudiante registrado con el email: " + requestDTO.email());
         }
 
         // Si va bien, procede con el flujo de guardado

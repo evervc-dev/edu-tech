@@ -5,12 +5,10 @@ import com.evervc.api.edutech.dto.CursoResponseDTO;
 import com.evervc.api.edutech.services.CursoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cursos")
@@ -25,5 +23,23 @@ public class CursoController {
 
         CursoResponseDTO respuesta = cursoService.crearCurso(request);
         return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CursoResponseDTO> obtenerCursoPorId(@PathVariable Long id) {
+        // Busca el recurso en la db a través del service
+        CursoResponseDTO respuesta = cursoService.obtenerPorId(id);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<CursoResponseDTO>> obtenerTodosLosCursos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<CursoResponseDTO> respuesta = cursoService.obtenerTodosLosCursos(page, size);
+
+        // Retorna 200 OK, lectura exitosa
+        return new ResponseEntity<>(respuesta, HttpStatus.OK);
     }
 }

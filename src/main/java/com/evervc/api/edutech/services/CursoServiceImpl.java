@@ -9,6 +9,9 @@ import com.evervc.api.edutech.mappers.CursoMapper;
 import com.evervc.api.edutech.repositories.CategoriaRepository;
 import com.evervc.api.edutech.repositories.CursoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,5 +42,31 @@ public class CursoServiceImpl implements CursoService {
 
         // Retorna el mensaje al cliente
         return cursoMapper.toResponseDTO(cursoGuardado);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CursoResponseDTO obtenerPorId(Long id) {
+        // Busca el objeto
+        Curso curso = cursoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el curso con ID: " + id));
+
+        // Se convierte a DTO
+        return cursoMapper.toResponseDTO(curso);
+    }
+
+    @Override
+    @Transactional(readOnly = true) // Consulta de solo lectura
+    public Page<CursoResponseDTO> obtenerTodosLosCursos(int page, int size) {
+
+        // Crea el objeto Pageable de Spring. La primera página es la número 0.
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Ejecuta la búsqueda. JPA automáticamente hace el COUNT total y el LIMIT/OFFSET.
+        Page<Curso> cursosPage = cursoRepository.findAll(pageable);
+
+        // E objeto Page tiene un método .map() integrado
+        // recorre internamente cada Curso y lo pasa por MapStruct para convertirlo a DTO.
+        return cursosPage.map(cursoMapper::toResponseDTO);
     }
 }

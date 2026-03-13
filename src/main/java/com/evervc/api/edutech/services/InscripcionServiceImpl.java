@@ -1,5 +1,6 @@
 package com.evervc.api.edutech.services;
 
+import com.evervc.api.edutech.dto.EstudianteDashboardResponseDTO;
 import com.evervc.api.edutech.dto.InscripcionRequestDTO;
 import com.evervc.api.edutech.dto.InscripcionResponseDTO;
 import com.evervc.api.edutech.entities.Curso;
@@ -8,6 +9,7 @@ import com.evervc.api.edutech.entities.Inscripcion;
 import com.evervc.api.edutech.enums.Estado;
 import com.evervc.api.edutech.exceptions.RecursoNoEncontradoException;
 import com.evervc.api.edutech.exceptions.ReglaNegocioException;
+import com.evervc.api.edutech.mappers.EstudianteDashboardMapper;
 import com.evervc.api.edutech.mappers.InscripcionMapper;
 import com.evervc.api.edutech.repositories.CursoRepository;
 import com.evervc.api.edutech.repositories.EstudianteRepository;
@@ -17,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class InscripcionServiceImpl implements InscripcionService {
     private final EstudianteRepository estudianteRepository;
     private final CursoRepository cursoRepository;
     private final InscripcionMapper inscripcionMapper;
+    private final EstudianteDashboardMapper estudianteDashboardMapper;
 
     @Override
     @Transactional
@@ -65,24 +66,11 @@ public class InscripcionServiceImpl implements InscripcionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<InscripcionResponseDTO> cursosInscritosPorIdEstudiante(Long estudianteId) {
+    public EstudianteDashboardResponseDTO cursosInscritosPorIdEstudiante(Long estudianteId) {
         // Verifica la existencia del Estudiante
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el estudiante con ID: " + estudianteId));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Estudiante no encontrado con ID: " + estudianteId));
 
-        // Verifica si tiene al menos una inscripción
-        if (!inscripcionRepository.existsByEstudianteId(estudianteId)) {
-            throw new ReglaNegocioException("El estudiante no tiene ningún curso inscrito.");
-        }
-
-        // Obtiene los cursos en los que se encuentra inscrito el estudiante
-        List<Inscripcion> inscripciones = inscripcionRepository.findAllByEstudianteId(estudianteId);
-        List<InscripcionResponseDTO> responseDTOS = new ArrayList<>();
-        // Mapeo a respuesta dto
-        for (Inscripcion inscripcion : inscripciones) {
-            responseDTOS.add(inscripcionMapper.toResponseDTO(inscripcion));
-        }
-
-        return responseDTOS;
+        return estudianteDashboardMapper.toDashboardDTO(estudiante);
     }
 }

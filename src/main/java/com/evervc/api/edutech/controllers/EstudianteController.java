@@ -1,6 +1,7 @@
 package com.evervc.api.edutech.controllers;
 
 import com.evervc.api.edutech.audit.AuditarTiempoRespuesta;
+import com.evervc.api.edutech.dto.EstudianteDashboardResponseDTO;
 import com.evervc.api.edutech.dto.EstudianteRequestDTO;
 import com.evervc.api.edutech.dto.EstudianteResponseDTO;
 import com.evervc.api.edutech.dto.InscripcionResponseDTO;
@@ -34,7 +35,7 @@ public class EstudianteController {
     }
 
     @GetMapping("/{id}/cursos")
-    public ResponseEntity<List<InscripcionResponseDTO>> obtenerCursosInscritos(@PathVariable Long id) {
+    public ResponseEntity<EstudianteDashboardResponseDTO> obtenerCursosInscritos(@PathVariable Long id) {
         return ResponseEntity.ok(inscripcionService.cursosInscritosPorIdEstudiante(id));
     }
 }

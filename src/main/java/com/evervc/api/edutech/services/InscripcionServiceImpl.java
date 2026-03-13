@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,5 +61,28 @@ public class InscripcionServiceImpl implements InscripcionService {
 
         // Retorna el ResponseDTO (MapStruct aplana los nombres del estudiante y curso aquí)
         return inscripcionMapper.toResponseDTO(inscripcionGuardada);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<InscripcionResponseDTO> cursosInscritosPorIdEstudiante(Long estudianteId) {
+        // Verifica la existencia del Estudiante
+        Estudiante estudiante = estudianteRepository.findById(estudianteId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el estudiante con ID: " + estudianteId));
+
+        // Verifica si tiene al menos una inscripción
+        if (!inscripcionRepository.existsByEstudianteId(estudianteId)) {
+            throw new ReglaNegocioException("El estudiante no tiene ningún curso inscrito.");
+        }
+
+        // Obtiene los cursos en los que se encuentra inscrito el estudiante
+        List<Inscripcion> inscripciones = inscripcionRepository.findAllByEstudianteId(estudianteId);
+        List<InscripcionResponseDTO> responseDTOS = new ArrayList<>();
+        // Mapeo a respuesta dto
+        for (Inscripcion inscripcion : inscripciones) {
+            responseDTOS.add(inscripcionMapper.toResponseDTO(inscripcion));
+        }
+
+        return responseDTOS;
     }
 }

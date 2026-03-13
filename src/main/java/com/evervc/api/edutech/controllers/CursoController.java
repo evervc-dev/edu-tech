@@ -50,4 +50,20 @@ public class CursoController {
         // Retorna 204 No Content, (estándar HTTP para cuando algo se eliminó con éxito y no hay cuerpo JSON que devolver)
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/reactivar")
+    public ResponseEntity<CursoResponseDTO> reactivarCurso(@PathVariable Long id) {
+        CursoResponseDTO respuesta = cursoService.reactivarCurso(id);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CursoResponseDTO> actualizarCurso(
+            @PathVariable Long id,
+            @Valid @RequestBody CursoRequestDTO request
+    ) {
+
+        CursoResponseDTO respuesta = cursoService.actualizarCurso(id, request);
+        return ResponseEntity.ok(respuesta);
+    }
 }

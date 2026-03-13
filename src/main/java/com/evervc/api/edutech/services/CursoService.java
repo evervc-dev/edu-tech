@@ -9,4 +9,6 @@ public interface CursoService {
     Page<CursoResponseDTO> obtenerTodosLosCursos(int page, int size); // Recibe el número de página y la cantidad de elementos por página
     CursoResponseDTO obtenerPorId(Long id);
     void eliminarCurso(Long id);
+    CursoResponseDTO actualizarCurso(Long id, CursoRequestDTO requestDTO);
+    CursoResponseDTO reactivarCurso(Long id);
 }

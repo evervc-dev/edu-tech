@@ -2,6 +2,8 @@ package com.evervc.api.edutech.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,8 @@ public class Curso {
     private String titulo;
 
     private Double precio;
+
+    private Boolean activo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Categoria categoria;

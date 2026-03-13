@@ -48,7 +48,7 @@ public class CursoServiceImpl implements CursoService {
     @Transactional(readOnly = true)
     public CursoResponseDTO obtenerPorId(Long id) {
         // Busca el objeto
-        Curso curso = cursoRepository.findById(id)
+        Curso curso = cursoRepository.findByIdAndActivoTrue(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el curso con ID: " + id));
 
         // Se convierte a DTO
@@ -63,10 +63,24 @@ public class CursoServiceImpl implements CursoService {
         Pageable pageable = PageRequest.of(page, size);
 
         // Ejecuta la búsqueda. JPA automáticamente hace el COUNT total y el LIMIT/OFFSET.
-        Page<Curso> cursosPage = cursoRepository.findAll(pageable);
+        Page<Curso> cursosPage = cursoRepository.findByActivoTrue(pageable);
 
         // E objeto Page tiene un método .map() integrado
         // recorre internamente cada Curso y lo pasa por MapStruct para convertirlo a DTO.
         return cursosPage.map(cursoMapper::toResponseDTO);
+    }
+
+    @Override
+    @Transactional
+    public void eliminarCurso(Long id) {
+        // Verifica que el curso exista (gracias a @SQLRestriction
+        // si ya fue "borrado" lógicamente, esto lanzará el 404 Not Found automáticamente)
+        Curso curso = cursoRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el curso con ID: " + id));
+
+        curso.setActivo(false);
+
+        // Actualiza con el nuevo estado
+        cursoRepository.save(curso);
     }
 }

@@ -42,4 +42,12 @@ public class CursoController {
         // Retorna 200 OK, lectura exitosa
         return new ResponseEntity<>(respuesta, HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarCurso(@PathVariable Long id) {
+        cursoService.eliminarCurso(id);
+
+        // Retorna 204 No Content, (estándar HTTP para cuando algo se eliminó con éxito y no hay cuerpo JSON que devolver)
+        return ResponseEntity.noContent().build();
+    }
 }
